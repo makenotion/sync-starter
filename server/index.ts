@@ -33,6 +33,7 @@ nextApp.prepare().then(async () => {
 		const intervalHanlder = setInterval(() => {
 			// Send random events with random data
 			socket.emit('block-created', {
+				id: faker.datatype.uuid(),
 				createdBy: faker.name.firstName(),
 				title: faker.lorem.sentence()
 			})

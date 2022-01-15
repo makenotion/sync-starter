@@ -33,7 +33,7 @@ export default function Home() {
   return (
 		<ul>
 			{
-				blocks.map(block => <li><b>{block.createdBy} added:</b> {block.title}</li>)
+				blocks.map(block => <li key={block.id}><b>{block.createdBy} added:</b> {block.title}</li>)
 			}
 		</ul>
   )
