@@ -26,12 +26,17 @@ nextApp.prepare().then(async () => {
 		console.log('connected')
 		socket.emit('message', 'Welcome to socket!')
 		socket.on('disconnect', () => {
+			clearInterval(intervalHanlder)
 			console.log('disconnected')
 		})
 
-		setInterval(() => {
+		const intervalHanlder = setInterval(() => {
 			// Send random events with random data
-			socket.emit('block-created', faker.lorem.sentence())
+			socket.emit('block-created', {
+				createdBy: faker.name.firstName(),
+				title: faker.lorem.sentence()
+			})
+			console.log('sending data')
 		}, 1000)
 	})
 

@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 
 export default function Home() {
+	const [blocks, setBlocks] = useState<Array<any>>([])
 	useEffect((): any => {
 		console.log('setting up socket...')
 		const socket = io({
@@ -19,6 +20,10 @@ export default function Home() {
 				console.log('Message: ', data)
 			} else if (eventName === 'block-created') {
 				console.log('Block Created: ', data)
+				setBlocks((blocks) => [
+					...blocks,
+					data
+				])
 			}
 		})
 
@@ -26,17 +31,10 @@ export default function Home() {
 	}, [])
 
   return (
-    <ul>
-      <li>
-        <Link href="/a" as="/a">
-          <a>a</a>
-        </Link>
-      </li>
-      <li>
-        <Link href="/b" as="/b">
-          <a>b</a>
-        </Link>
-      </li>
-    </ul>
+		<ul>
+			{
+				blocks.map(block => <li><b>{block.createdBy} added:</b> {block.title}</li>)
+			}
+		</ul>
   )
 }
