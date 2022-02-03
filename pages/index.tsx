@@ -24,7 +24,8 @@ export default function Home() {
 
 	return (
 		<>
-			<h2>Hi 👋</h2>
+			<h2>Hi and welcome 👋</h2>
+			<p>Open up <code>pages/index.tsx</code> and get started with the interview 🥳</p>
 		</>
 	)
 }
