@@ -26,11 +26,31 @@ const content = [
 	`The / command will quickly become your best friend in ::notion::.`,
 ]
 
+const textColors = ["#172340", "#212254", "#2c3168", "#393f6b", "#4e5fa2"]
+
+const createMessages = content.map((sentence, index) => ({
+	id: faker.datatype.uuid(),
+	// Some users have first and last names, some only have first name.
+	createdBy:
+		index % 2
+			? `${faker.name.firstName()} ${faker.name.lastName()}`
+			: faker.name.firstName(),
+	// Every other sentence will have a color. Kinda messy but works.
+	color: textColors[index / 2],
+	title: sentence,
+}))
+
+const updateMessages = createMessages.map(message => ({
+	...message,
+	createdBy: undefined,
+	title: _.shuffle(message.title.split(" ")).join(" "),
+}))
+
 function timeout(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise(resolve => setTimeout(resolve, ms))
 }
 async function sleep() {
-    await timeout(3000);
+	await timeout(3000)
 }
 
 nextApp.prepare().then(async () => {
@@ -51,12 +71,15 @@ nextApp.prepare().then(async () => {
 			console.log("disconnected")
 		})
 
-		for (const sentence of content) {
-			socket.emit("block-created", {
-				id: faker.datatype.uuid(),
-				createdBy: faker.name.firstName(),
-				title: sentence,
-			})
+		// Handle cretes
+		for (const message of createMessages) {
+			socket.emit("block-created", message)
+			await sleep()
+		}
+
+		// Handle updates
+		for (const message of updateMessages) {
+			socket.emit("block-updates", message)
 			await sleep()
 		}
 	})
