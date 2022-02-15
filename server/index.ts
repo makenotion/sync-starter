@@ -25,7 +25,7 @@ const content = [
 	`The / command will quickly become your best friend in ::notion::.`,
 ]
 
-const textColors = ["#172340", "#212254", "#2c3168", "#393f6b", "#4e5fa2"]
+const textColors = ["#8F00F2", "#00CFFB", "#5CFF00", "#FDFB00", "#FDAE32"]
 
 const createMessages = content.map((sentence, index) => ({
 	id: faker.datatype.uuid(),
@@ -42,7 +42,7 @@ const createMessages = content.map((sentence, index) => ({
 const updateMessages = createMessages.map(message => ({
 	...message,
 	createdBy: undefined,
-	title: _.shuffle(message.title.split(" ")).join(" "),
+	title: `${message.title} (updated)`,
 }))
 
 function timeout(ms: number) {
@@ -70,15 +70,11 @@ nextApp.prepare().then(async () => {
 			console.log("disconnected")
 		})
 
-		// Handle cretes
-		for (const message of createMessages) {
-			socket.emit("block-created", message)
+		// Send create, followed by and update
+		for (let i = 0; i < createMessages.length; i ++) {
+			socket.emit("block-create", createMessages[i])
 			await sleep()
-		}
-
-		// Handle updates
-		for (const message of updateMessages) {
-			socket.emit("block-updates", message)
+			socket.emit("block-update", updateMessages[i])
 			await sleep()
 		}
 	})
