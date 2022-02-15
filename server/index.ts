@@ -40,8 +40,7 @@ const createMessages = content.map((sentence, index) => ({
 }))
 
 const updateMessages = createMessages.map(message => ({
-	...message,
-	createdBy: undefined,
+	id: message.id,
 	title: `${message.title} (updated)`,
 }))
 
