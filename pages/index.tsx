@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { socket } from './helpers/socket'
+import { socket } from "./helpers/socket"
 
 export default function Home() {
 	useEffect((): any => {
