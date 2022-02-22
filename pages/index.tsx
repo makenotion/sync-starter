@@ -1,24 +1,30 @@
-import { useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { socket } from "./helpers/socket"
 
 export default function Home() {
-	useEffect((): any => {
-		socket.onAny((eventName, data) => {
-			/*************************************************
-			 * Handle web socket events below here 👇        *
-			 *************************************************/
-			console.log({
-				eventName,
-				data,
-			})
-			/*************************************************
-			 * Handle web socket events above here 👇        *
-			 *************************************************/
-		})
+	const [blocks, setBlocks] = useState<any>([])
 
-		// Disconnect from socket once component is removed from screen.
-		return () => socket.disconnect()
-	}, [])
+	const handleEvent = (eventName, data) => {
+		/*************************************************
+		 * Handle web socket events below here 👇        *
+		 *************************************************/
+		console.log({
+			eventName,
+			data,
+		})
+		if (eventName === "block-create") {
+			console.log({ blocks })
+			setBlocks(([...blocks, data]))
+		}
+		/*************************************************
+		 * Handle web socket events above here 👆        *
+		 *************************************************/
+	}
+
+	useEffect((): any => {
+		socket.onAny(handleEvent)
+		return () => socket.offAny(handleEvent)
+	}, [handleEvent])
 
 	return (
 		<>
@@ -27,6 +33,7 @@ export default function Home() {
 				Open up <code>pages/index.tsx</code> and get started with the interview
 				🥳
 			</p>
+			{blocks.length}
 		</>
 	)
 }
