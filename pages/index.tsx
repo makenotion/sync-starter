@@ -1,30 +1,24 @@
-import { useCallback, useEffect } from "react"
-import { io } from "socket.io-client"
-
-const socket = io({
-	path: "/api/socketio",
-})
-
-socket.on("connect", () => {
-	console.log("Socket connected 🥳")
-})
+import { useEffect } from "react"
+import { socket } from './helpers/socket'
 
 export default function Home() {
-	const socketHandler = useCallback((eventName, data) => {
-		// Handle sockets in here...
-		console.log({
-			eventName,
-			data
+	useEffect((): any => {
+		socket.onAny((eventName, data) => {
+			/*************************************************
+			 * Handle web socket events below here 👇        *
+			 *************************************************/
+			console.log({
+				eventName,
+				data,
+			})
+			/*************************************************
+			 * Handle web socket events above here 👇        *
+			 *************************************************/
 		})
+
+		// Disconnect from socket once component is removed from screen.
+		return () => socket.disconnect()
 	}, [])
-
-	const handleSocket = (): any => {
-		socket.onAny(socketHandler)
-
-		if (socket) return () => socket.disconnect()
-	}
-
-	useEffect(handleSocket, [])
 
 	return (
 		<>
