@@ -1,3 +1,9 @@
+/* ================================================================================
+
+	 Mock Event Server
+
+================================================================================ */
+
 import _ from "lodash"
 import * as http from "http"
 import next from "next"
@@ -5,16 +11,20 @@ import express, { Express, Request, Response } from "express"
 import * as socketio from "socket.io"
 import faker from "faker"
 
-const port = parseInt(process.env.PORT || "3000", 10)
-const dev = process.env.NODE_ENV !== "production"
-const nextApp = next({ dev })
-const nextHandler = nextApp.getRequestHandler()
+/**********************************************************
+ * Constants
+ **********************************************************/
+const MILLISECONDS_BETWEEN_EVENTS = 3000
 
+/**********************************************************
+ * Data
+ **********************************************************/
 const content = [
 	`Everything in ::notion:: is a "block"`,
 	`When you create your first page in ::notion:: and begin typing, you've started with a text block. But ::notion:: pages can contain a lot more than plain text!`,
-	`Imagine every piece of content you add to a page — whether it's text, an image, or a table — as a single building block. Every page is a stack of blocks combined however you want.`,
-	`Blocks can transform`,
+	`The / command will quickly become your best friend in ::notion::`,
+	`What would double ::notion::::notion:: look like??`,
+	`::notion:: allows blocks to transform`,
 	`Any block in ::notion:: can be turned into any other type of block in order to use, view, or deepen that information in a new way.`,
 	`Blocks can be rearranged`,
 	`A tool to build your own tools`,
@@ -22,7 +32,6 @@ const content = [
 	`Every page you create in ::notion:: is a fresh canvas where you can add whatever content you want. Follow these steps to create your first one 📄`,
 	`Start writing`,
 	`Begin typing whatever you want. You'll notice other features fade away, leaving you with your thoughts.`,
-	`The / command will quickly become your best friend in ::notion::.`,
 ]
 
 const textColors = ["#8F00F2", "#00CFFB", "#5CFF00", "#FDFB00", "#FDAE32"]
@@ -34,22 +43,20 @@ const createMessages = content.map((sentence, index) => ({
 		index % 2
 			? `${faker.name.firstName()} ${faker.name.lastName()}`
 			: faker.name.firstName(),
-	// Every other sentence will have a color. Kinda messy but works.
-	color: textColors[index / 2],
+	// Every other sentence should have a color
+	color: index % 2 ? textColors[index / 2] : undefined,
 	title: sentence,
 }))
 
 const updateMessages = createMessages.map(message => ({
 	id: message.id,
-	title: `${message.title} (updated)`,
+	title: `(updated) ${message.title}`,
 }))
 
-function timeout(ms: number) {
-	return new Promise(resolve => setTimeout(resolve, ms))
-}
-async function sleep() {
-	await timeout(3000)
-}
+const port = parseInt(process.env.PORT || "3000", 10)
+const dev = process.env.NODE_ENV !== "production"
+const nextApp = next({ dev })
+const nextHandler = nextApp.getRequestHandler()
 
 nextApp.prepare().then(async () => {
 	const app: Express = express()
@@ -58,19 +65,17 @@ nextApp.prepare().then(async () => {
 		path: "/api/socketio",
 	})
 
-	app.get("/hello", async (_: Request, res: Response) => {
-		res.send("Hello, world!")
-	})
-
 	io.on("connection", async (socket: socketio.Socket) => {
-		// Send page title on connect
-		socket.emit("title", "Notion Interview")
 		socket.on("disconnect", () => {
 			console.log("disconnected")
 		})
 
+		// Send page title on connect
+		socket.emit("title", "Notion Interview")
+		await sleep()
+
 		// Send create, followed by and update
-		for (let i = 0; i < createMessages.length; i ++) {
+		for (let i = 0; i < createMessages.length; i++) {
 			socket.emit("block-create", createMessages[i])
 			await sleep()
 			socket.emit("block-update", updateMessages[i])
@@ -86,3 +91,12 @@ nextApp.prepare().then(async () => {
 		console.log(`Listening on port ${port}...`)
 	})
 })
+
+function timeout(ms: number) {
+	return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function sleep() {
+	await timeout(MILLISECONDS_BETWEEN_EVENTS)
+}
+

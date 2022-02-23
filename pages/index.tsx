@@ -1,7 +1,11 @@
+// If you want Typescript checking, remove the line below 👇
+// @ts-nocheck
 import { useEvent } from "./helpers/socket"
 
-export default function Home() {
-	useEvent((eventName: string, data: any) => {
+type EventName = "block-create" | "block-update" | "title"
+
+export default function Notion() {
+	useEvent((eventName: EventName, data: any) => {
 		console.log({
 			eventName,
 			data,
