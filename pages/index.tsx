@@ -19,6 +19,11 @@ export default function Notion() {
 				Open up <code>pages/index.tsx</code> and get started with the interview
 				🥳
 			</p>
+			<p className="callout">
+				If you decide you want the events to be sent faster, you can edit the{" "}
+				<code>MILLISECONDS_BETWEEN_EVENTS</code> variable in{" "}
+				<code>server/index.ts</code>.
+			</p>
 		</>
 	)
 }
