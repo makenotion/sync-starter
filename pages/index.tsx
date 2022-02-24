@@ -2,7 +2,7 @@
 // @ts-nocheck
 import { useEvent } from "./helpers/socket"
 
-type EventName = "block-create" | "block-update" | "title"
+type EventName = "block-create" | "block-update" | "page-title"
 
 export default function Notion() {
 	useEvent((eventName: EventName, data: any) => {

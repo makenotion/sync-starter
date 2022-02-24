@@ -34,7 +34,7 @@ const content = [
 	`Begin typing whatever you want. You'll notice other features fade away, leaving you with your thoughts.`,
 ]
 
-const textColors = ["#8F00F2", "#00CFFB", "#5CFF00", "#FDFB00", "#FDAE32"]
+const textColors = ["#8F00F2", "#00CFFB", "#5CFF00", "#E71111", "#FDAE32", "#C51A97"]
 
 const createMessages = content.map((sentence, index) => ({
 	id: faker.datatype.uuid(),
@@ -44,13 +44,17 @@ const createMessages = content.map((sentence, index) => ({
 			? `${faker.name.firstName()} ${faker.name.lastName()}`
 			: faker.name.firstName(),
 	// Every other sentence should have a color
-	color: index % 2 ? textColors[index / 2] : undefined,
-	title: sentence,
+	color: textColors[index / 2],
+	content: sentence,
+	// Provide `type` in message to allow candidate to use discriminated union
+	// type if they want.
+	type: "block-create"
 }))
 
 const updateMessages = createMessages.map(message => ({
 	id: message.id,
-	title: `(updated) ${message.title}`,
+	content: `(updated) ${message.content}`,
+	type: "block-update"
 }))
 
 const port = parseInt(process.env.PORT || "3000", 10)
@@ -71,7 +75,10 @@ nextApp.prepare().then(async () => {
 		})
 
 		// Send page title on connect
-		socket.emit("title", "Notion Interview")
+		socket.emit("page-title", {
+			content: "Notion Interview",
+			type: "page-title"
+		})
 		await sleep()
 
 		// Send create, followed by and update

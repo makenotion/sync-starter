@@ -1,7 +1,5 @@
-import assert from 'assert'
+import {} from '../pages'
 
-describe('something', () => {
-	it('should pass', () => {
-		assert.ok(true)
-	})
+test('example test', () => {
+	expect(null).toBeNull()
 })
